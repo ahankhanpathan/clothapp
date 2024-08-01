@@ -1,0 +1,197 @@
+//item_Details_page
+import '../../Controllers/cart_controller.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '/Models/product.dart';
+
+class ItemDetailPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final Product product = Get.arguments as Product;
+    final CartController cartController = Get.put(CartController());
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          product.title,
+          overflow: TextOverflow.ellipsis,
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.shopping_cart),
+            onPressed: () {
+              Get.offNamed('/cart');
+            },
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(
+              product.image,
+              height: 220,
+              width: 250,
+            ),
+            SizedBox(height: 10),
+            Text(
+              product.title,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              '\$${product.price.toStringAsFixed(2)}',
+              style: TextStyle(fontSize: 20, color: Colors.green),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Rating: ${product.rating.rate} (${product.rating.count} reviews)',
+              style: TextStyle(fontSize: 10),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Description',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(product.description),
+            SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () {
+                cartController.addItemToCart(product.id, product.title, product.price);
+              },
+              child: Text('Add to Cart'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+//cartitem
+
+import 'dart:convert';
+
+class ClothingItem {
+  final int id;
+  final String title;
+  final double price;
+
+  ClothingItem({
+    required this.id,
+    required this.title,
+    required this.price,
+  });
+
+  String toJson() => json.encode({
+    'id': id,
+    'title': title,
+    'price': price,
+  });
+
+  static ClothingItem fromJson(String jsonString) {
+    final jsonData = json.decode(jsonString);
+    return ClothingItem(
+      id: jsonData['id'],
+      title: jsonData['title'],
+      price: jsonData['price'],
+    );
+  }
+}
+
+
+//cart_contorller
+
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../Models/cartitem.dart';
+
+class CartController extends GetxController {
+  var cartItems = <ClothingItem>[].obs;
+  var totalPrice = 0.0.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadCartFromPreferences();
+  }
+
+  void addItemToCart(int productId, String title, double price) async {
+    var item = ClothingItem(id: productId, title: title, price: price);
+    cartItems.add(item);
+    totalPrice.value += price;
+    await saveCartToPreferences();
+  }
+
+  void removeItemFromCart(ClothingItem item) async {
+    cartItems.remove(item);
+    totalPrice.value -= item.price;
+    await saveCartToPreferences();
+  }
+
+  Future<void> saveCartToPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> cartList = cartItems.map((item) => item.toJson()).toList();
+    await prefs.setStringList('cart', cartList);
+  }
+
+  Future<void> loadCartFromPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String>? cartList = prefs.getStringList('cart');
+    if (cartList != null) {
+      cartItems.value = cartList.map((item) => ClothingItem.fromJson(item)).toList();
+      totalPrice.value = cartItems.fold(0, (sum, item) => sum + item.price);
+    }
+  }
+}
+
+ return
+                        ListTile(
+                          leading: Image.network(
+                            item.image!,
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                          ),
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  item.title!,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '\$${item.price!.toStringAsFixed(2)}',
+                                style: TextStyle(fontSize: 20),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.remove_circle),
+                                color: Colors.red,
+                                onPressed: () {
+                                  cartController.decrementQuantity(item);
+                                },
+                              ),
+                              Text('${item.quantity ?? 1}'),
+                              IconButton(
+                                icon: Icon(Icons.add_circle),
+                                color: Colors.green,
+                                onPressed: () {
+                                  cartController.incrementQuantity(item);
+                                },
+                              ),
+                            ],
+                          ),
+                        );

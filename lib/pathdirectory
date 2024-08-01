@@ -1,0 +1,63 @@
+Directory:
+├── 
+
+file:
+└──  
+path:
+ |
+
+lib
+├── Constants
+├── Controllers
+│   └── auth_controller.dart
+│   └── cart_controller.dart
+|   └── home_controller.dart
+|   └── item_controller.dart
+|   └──checkout_controller.dart
+|   └──fav_controller.dart
+|   
+├──  Services 
+│   └── api_service.dart  
+|
+├──Models
+|    └──product.dart
+|
+├── Utils
+│   └── route_generator.dart
+|
+├── Views
+│   ├── Auth
+│   │   ├── login_screen.dart
+│   │   └── signup_screen.dart
+│   ├── Home
+│   │   ├── home_screen.dart
+│   │   └── home_section.dart
+│   ├── Item
+│   │   └── item_details_page.dart
+│   ├── Cart
+│   │   └── cart_page.dart
+│   ├── Splash
+│   |   └── splash_screen.dart
+|   ├── Address
+│   |  ├── Address_screen.dart
+|   |
+|   ├──checkout
+|   |  └── checkout_page.dart
+|   |  
+|   ├──favpage
+|   |   └── fav_page.dart
+|   |
+|   ├──order
+|   |   └── order_page.dart
+|   |
+|   ├──Profile
+|   |   └──profilepage.dart
+|   |
+|   ├──Search
+|   |   └──search_screen.dart
+|   |
+|   ├── Settings
+|       └──settins_page.dart
+|  
+└── Main.dart
+
